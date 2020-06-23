@@ -1,8 +1,25 @@
 type User {
   id: ID!
   email: String!
+  username: String!
+  avatar: String
+  created: String!
+  updated: String!
+}
+
+type Auth {
+  id: ID!
+  username: String!
+  token: String!
 }
 
 type Query {
-  user: User!
+  users: [User!]!
+  user(username: String!): User
+  me: User!
+}
+
+type Mutation {
+  register(email: String!, username: String!, password: String!): Auth!
+  login(username: String!, password: String!): Auth!
 }
