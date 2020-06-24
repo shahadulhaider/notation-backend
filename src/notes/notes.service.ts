@@ -13,7 +13,7 @@ import { Note } from './note.entity';
 export class NotesService {
   constructor(
     @InjectRepository(Note) private notesRepo: Repository<Note>,
-    @InjectRepository(User) private userRepo: Repository<User>,
+    @InjectRepository(User) private usersRepo: Repository<User>,
   ) {}
 
   async findAll(): Promise<NoteRO[]> {
@@ -29,7 +29,7 @@ export class NotesService {
   }
 
   async create(userId: string, data: NoteDto): Promise<NoteRO> {
-    const user = await this.userRepo.findOne(userId);
+    const user = await this.usersRepo.findOne(userId);
     const note = this.notesRepo.create({ ...data, author: user });
 
     await this.notesRepo.save(note);
@@ -74,5 +74,32 @@ export class NotesService {
       return false;
     }
   }
-  // async toggleFavorite() {}
+  async toggleFavorite(id: string, userId: string): Promise<NoteRO> {
+    const note = await this.notesRepo.findOne(id, {
+      relations: ['author', 'favoritedBy'],
+    });
+
+    if (!note) {
+      throw new NotFoundException();
+    }
+
+    const user = await this.usersRepo.findOne(userId);
+    const favorited = note.favoritedBy.some((f) => f.id === userId);
+
+    if (favorited) {
+      // filter out from favoritedBy array, decrease favoriteCount
+      note.favoritedBy = note.favoritedBy.filter((fav) => fav.id !== user.id);
+      note.favoriteCount -= 1;
+      await this.notesRepo.save(note);
+
+      return note;
+    } else {
+      //  push to favoritedBy array, increase favoriteCount
+      note.favoritedBy.push(user);
+      note.favoriteCount += 1;
+      await this.notesRepo.save(note);
+
+      return note;
+    }
+  }
 }
