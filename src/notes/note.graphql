@@ -1,0 +1,21 @@
+type Note {
+  id: ID!
+  content: String!
+  author: User!
+  favoriteCount: Int!
+  favoritedBy: [User]
+  created: String!
+  updated: String!
+}
+
+type Query {
+  notes: [Note!]!
+  note(id: ID!): Note!
+}
+
+type Mutation {
+  addNote(content: String!): Note!
+  editNote(id: ID!, content: String!): Note!
+  removeNote(id: ID!): Boolean!
+  toggleFavorite(id: ID!): Note!
+}

@@ -1,10 +1,12 @@
 import * as bcrypt from 'bcrypt';
+import { Note } from 'src/notes/note.entity';
 import {
   BaseEntity,
   BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -31,6 +33,9 @@ export class User extends BaseEntity {
 
   @UpdateDateColumn()
   updated: Date;
+
+  @OneToMany((type) => Note, (note) => note.author)
+  notes: Note[];
 
   @BeforeInsert()
   async hashPassword() {

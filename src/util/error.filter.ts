@@ -8,8 +8,8 @@ import {
 } from '@nestjs/common';
 import {
   GqlArgumentsHost,
-  GqlExceptionFilter,
   GqlContextType,
+  GqlExceptionFilter,
 } from '@nestjs/graphql';
 import { Request, Response } from 'express';
 import { GraphQLResolveInfo } from 'graphql';
@@ -61,11 +61,11 @@ export class HttpErrorFilter implements ExceptionFilter, GqlExceptionFilter {
     } else if (host.getType<GqlContextType>() === 'graphql') {
       const gqlHost = GqlArgumentsHost.create(host);
       const info = gqlHost.getInfo<GraphQLResolveInfo>();
-      const error = JSON.parse(JSON.stringify(exception.getResponse()));
+      const { error } = JSON.parse(JSON.stringify(exception));
       const errorResponse = {
         ...err,
         error,
-        message: error.message,
+        message: error ? error.message : message,
         type: info.parentType,
         field: info.fieldName,
       };
